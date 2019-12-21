@@ -23,7 +23,10 @@ public class WorldMap implements IPositionChangeObserver {
     private Map<Vector2D, Grass> grassFields = new HashMap<>();
     private Map<Vector2D, List<Animal>> animalMap = new HashMap<>();
 
-    public WorldMap(int mapWidth, int mapHeight, int jungleWidth, int jungleHeight) {
+    public WorldMap(int mapWidth, int mapHeight, float jungleRatio) {
+        int jungleWidth = (int)Math.ceil(mapWidth * jungleRatio);
+        int jungleHeight = (int)Math.ceil(mapHeight * jungleRatio);
+
         leftBottomWorldCorner = new Vector2D(0,0);
         rightTopWorldCorner =  new Vector2D(mapWidth-1, mapHeight-1);
         leftBottomJungleCorner = new Vector2D(0, 0);

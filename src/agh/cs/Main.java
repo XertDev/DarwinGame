@@ -1,5 +1,6 @@
 package agh.cs;
 
+import agh.cs.config.Config;
 import agh.cs.engine.World;
 import agh.cs.engine.WorldMap;
 import agh.cs.engine.entities.Animal;
@@ -10,8 +11,9 @@ import java.util.stream.IntStream;
 
 public class Main {
     public static void main(String[] args) {
-        WorldMap map = new WorldMap(5, 5, 2, 2);
-        World world = new World(30, 2, 50, map);
+        Config config= Config.loadConfigFromFile("config.json");
+        WorldMap map = new WorldMap(config.getWidth(), config.getHeight(), config.getJungleRatio());
+        World world = new World(config.getPlantEnergy(), config.getMoveEnergy(), config.getStartEnergy(), map);
         Animal animal1 = new Animal(map, new Vector2D(3, 3), 50);
         Animal animal2 = new Animal(map, new Vector2D(3, 4), 50);
 
