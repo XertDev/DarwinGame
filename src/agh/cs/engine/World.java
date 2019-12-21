@@ -14,7 +14,7 @@ public class World {
     private float grassEnergy;
     private float dailyEnergyDepletion;
     private float initialAnimalEnergy;
-    private float maxEnergy;
+    private float maxAnimalEnergy;
     private int deathCounter = 0;
     private long deathAgeSum = 0;
 
@@ -22,13 +22,13 @@ public class World {
             float grassEnergy,
             float dailyEnergyDepletion,
             float initialAnimalEnergy,
-            float maxEnergy,
+            float maxAnimalEnergy,
             int initialGrassFieldCount,
             WorldMap map
     ) {
         this.map = map;
         this.grassEnergy = grassEnergy;
-        this.maxEnergy = maxEnergy;
+        this.maxAnimalEnergy = maxAnimalEnergy;
         this.dailyEnergyDepletion = dailyEnergyDepletion;
         this.initialAnimalEnergy = initialAnimalEnergy;
         IntStream.range(0, initialGrassFieldCount).forEach((i) -> map.generateJungleGrass());
@@ -45,13 +45,9 @@ public class World {
             Vector2D pos = map.findRandomEmptyField().orElseThrow(
                     () -> new RuntimeException("Cannot place new animal. Empty field not found")
             );
-            Animal animal = new Animal(map, pos, initialAnimalEnergy, maxEnergy);
+            Animal animal = new Animal(map, pos, initialAnimalEnergy, maxAnimalEnergy);
             placeAnimal(animal);
         }
-    }
-
-    public WorldMap getMap() {
-        return map;
     }
 
     public long getEpoch()
@@ -69,6 +65,10 @@ public class World {
 
     public int getDeathCounter() {
         return deathCounter;
+    }
+
+    public float getMaxAnimalEnergy() {
+        return maxAnimalEnergy;
     }
 
     private void updateAnimalsPosition() {
@@ -119,17 +119,13 @@ public class World {
 
             Arrays.sort(strongestAnimals, Animal.energyEntityComparator);
 
-            Animal child = strongestAnimals[0].breed(strongestAnimals[1], childPos, maxEnergy);
+            Animal child = strongestAnimals[0].breed(strongestAnimals[1], childPos, maxAnimalEnergy);
             placeAnimal(child);
         }
     }
 
     public int getAnimalCount() {
         return animals.size();
-    }
-
-    public int getGrassCount() {
-        return map.getGrassFields().size();
     }
 
     private void growGrass() {

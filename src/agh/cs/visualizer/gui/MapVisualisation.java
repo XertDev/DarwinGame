@@ -8,8 +8,6 @@ import agh.cs.engine.utils.Vector2D;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Semaphore;
 
 public class MapVisualisation extends JPanel {
@@ -48,10 +46,7 @@ public class MapVisualisation extends JPanel {
         int canvasWidth = cellSize * mapWidth;
         int canvasHeight = cellSize * mapHeight;
 
-        System.out.println(canvasHeight);
-
         setPreferredSize(new Dimension(canvasWidth, canvasHeight));
-        setBorder(BorderFactory.createLineBorder(Color.black));
     }
 
     private Vector2D toScreenPosition(Vector2D pos) {
@@ -79,11 +74,11 @@ public class MapVisualisation extends JPanel {
         try{
             mapLock.acquire();
             List<List<Animal>> groupedAnimals = map.getGroupedAnimals();
-            Set<Map.Entry<Vector2D, Grass>> grassFields = map.getGrassFields();
+            List<Grass> grassFields = map.getGrassFields();
 
             graphics.setColor(new Color(100, 255, 100));
-            for(Map.Entry<Vector2D, Grass> grassField: grassFields) {
-                Vector2D pos = toScreenPosition(grassField.getKey());
+            for(Grass grassField: grassFields) {
+                Vector2D pos = toScreenPosition(grassField.getPosition());
                 graphics.fillRect(pos.x, pos.y, cellSize, cellSize);
             }
 

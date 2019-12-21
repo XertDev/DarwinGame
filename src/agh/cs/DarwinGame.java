@@ -22,6 +22,10 @@ public class DarwinGame {
 
         world.placeRandomAnimals(config.getInitialAnimalCount());
 
-        SimulatorVisualiser.start(world, config.getTickCount(), config.getMaxEnergy());
+        try {
+            SimulatorVisualiser.start(world, map, config.getTickPeriod());
+        }  catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 }

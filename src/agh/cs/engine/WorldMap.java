@@ -163,8 +163,12 @@ public class WorldMap implements IPositionChangeObserver {
         return new ArrayList<>(animalMap.values());
     }
 
-    public Set<Map.Entry<Vector2D, Grass>> getGrassFields() {
-        return grassFields.entrySet();
+    public List<Grass> getGrassFields() {
+        return new ArrayList<>(grassFields.values());
+    }
+
+    public int getGrassCount() {
+        return grassFields.size();
     }
 
     public Optional<Vector2D> findRandomEmptyField() {

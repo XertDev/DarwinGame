@@ -1,6 +1,7 @@
 package agh.cs.visualizer.gui;
 
 import agh.cs.engine.World;
+import agh.cs.engine.WorldMap;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,8 +24,8 @@ public class SimulatorVisualiser extends JPanel {
 
     private boolean pauseFlag = false;
 
-    private SimulatorVisualiser(World world, int ticks, float maxEnergy) {
-        MapVisualisation mapVisualisation = new MapVisualisation(world.getMap(), maxEnergy, mapLock);
+    private SimulatorVisualiser(World world, WorldMap map, int tickPeriod) {
+        MapVisualisation mapVisualisation = new MapVisualisation(map, world.getMaxAnimalEnergy(), mapLock);
 
         Box hBox = Box.createHorizontalBox();
         Box sidePanel = Box.createVerticalBox();
@@ -61,7 +62,7 @@ public class SimulatorVisualiser extends JPanel {
                 world.runEpoch();
                 epoch = world.getEpoch();
                 animalsCount = world.getAnimalCount();
-                grassCount = world.getGrassCount();
+                grassCount = map.getGrassCount();
                 averageAge = world.getAverageLivingAnimalsAge();
 
             } catch (InterruptedException e) {
@@ -92,7 +93,7 @@ public class SimulatorVisualiser extends JPanel {
         });
 
         ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        executor.scheduleAtFixedRate(cycle, 0, ticks, TimeUnit.MILLISECONDS);
+        executor.scheduleAtFixedRate(cycle, 0, tickPeriod, TimeUnit.MILLISECONDS);
     }
 
     private void togglePause() {
@@ -111,25 +112,18 @@ public class SimulatorVisualiser extends JPanel {
         pauseFlag = false;
     }
 
-    private static void show(World world, int tickCount, float maxEnergy) {
+    private static void show(World world, WorldMap map, int tickPeriod) {
         JFrame.setDefaultLookAndFeelDecorated(false);
 
         JFrame frame = new JFrame("DarwinGame");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        try {
-            frame.setContentPane(new SimulatorVisualiser(world, tickCount, maxEnergy));
-        } catch(Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        frame.setContentPane(new SimulatorVisualiser(world, map, tickPeriod));
 
         frame.pack();
         frame.setVisible(true);
     }
 
-    static public void start(World world, int tickCount, float maxEnergy) {
-
-        SwingUtilities.invokeLater(() -> show(world, tickCount, maxEnergy));
-
+    static public void start(World world, WorldMap map,int tickPeriod) {
+        SwingUtilities.invokeLater(() -> show(world, map, tickPeriod));
     }
 }

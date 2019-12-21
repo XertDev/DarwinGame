@@ -10,16 +10,12 @@ public class Genome {
 
     private final int[] genes;
 
-    private static Random generator = new Random();
+    private static final Random generator = new Random();
 
     public Genome() {
         genes = new int[geneCount];
-        IntStream.range(0, geneTypeCount).forEach((index) -> {
-            genes[index] = index;
-        });
-        IntStream.range(geneTypeCount,geneCount).forEach((index) -> {
-            genes[index]  = generator.nextInt(geneTypeCount);
-        });
+        IntStream.range(0, geneTypeCount).forEach((index) -> genes[index] = index);
+        IntStream.range(geneTypeCount,geneCount).forEach((index) -> genes[index]  = generator.nextInt(geneTypeCount));
     }
 
     private Genome(int[] genes) {
@@ -37,9 +33,7 @@ public class Genome {
         }
 
         int[] newGenes = new int[geneCount];
-        IntStream.range(0, geneTypeCount).forEach((gene) -> {
-            newGenes[gene] = gene;
-        });
+        IntStream.range(0, geneTypeCount).forEach((gene) -> newGenes[gene] = gene);
 
         int[] splitPoint = generator.ints(geneTypeCount, geneCount).distinct().limit(2).toArray();
         Arrays.sort(splitPoint);
@@ -50,7 +44,7 @@ public class Genome {
         for(int i = splitPoint[0]+1; i <= splitPoint[1]; ++i) {
             newGenes[i] = genes2[i];
         }
-        for(int i = splitPoint[1] +1; i <= geneCount-1; ++i) {
+        for(int i = splitPoint[1] +1; i < geneCount; ++i) {
             newGenes[i] = genes1[i];
         }
         return new Genome(newGenes);

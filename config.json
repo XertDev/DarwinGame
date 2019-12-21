@@ -7,8 +7,8 @@
   "plantEnergy": 40.0,
   "moveEnergy": 2.0,
 
-  "initialAnimalCount": 10,
+  "initialAnimalCount": 30,
   "initialGrassFieldsCount": 200,
   "maxEnergy": 300.0,
-  "tickCount": 20
+  "tickPeriod": 20
 }

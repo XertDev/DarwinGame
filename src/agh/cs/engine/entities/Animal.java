@@ -14,12 +14,11 @@ public class Animal {
     private final float maxEnergy;
     private Vector2D position;
     private MapDirection facingDirection = MapDirection.NORTH;
-    private Genome genome;
+    private final Genome genome;
     private int age = 0;
 
-    private static Random generator = new Random();
-    private Set<IPositionChangeObserver> positionChangedObservers = new HashSet<>();
-    private WorldMap worldMap;
+    private final Set<IPositionChangeObserver> positionChangedObservers = new HashSet<>();
+    private final WorldMap worldMap;
 
     public MapDirection getFacingDirection() {
         return facingDirection;
@@ -91,6 +90,9 @@ public class Animal {
     }
 
     public void depleteEnergy(double usedEnergy) {
+        if(usedEnergy < 0) {
+            throw new IllegalArgumentException("usedEnergy must be a positive integer");
+        }
         energy -= usedEnergy;
     }
 

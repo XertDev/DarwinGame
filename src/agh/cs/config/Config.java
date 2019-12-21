@@ -21,7 +21,7 @@ public class Config {
     private int initialGrassFieldsCount;
     private int initialAnimalCount;
 
-    private int tickCount;
+    private int tickPeriod;
 
     public int getWidth() {
         return width;
@@ -51,8 +51,8 @@ public class Config {
         return maxEnergy;
     }
 
-    public int getTickCount() {
-        return tickCount;
+    public int getTickPeriod() {
+        return tickPeriod;
     }
 
     public int getInitialGrassFieldsCount() {
@@ -90,8 +90,8 @@ public class Config {
         if(initialGrassFieldsCount < 0) {
             throw new IllegalArgumentException(errorPrefix + "initialGrassFieldsCount must be a positive integer");
         }
-        if(tickCount <= 15) {
-            throw new IllegalArgumentException(errorPrefix + "tickCount must be above 15");
+        if(tickPeriod <= 15) {
+            throw new IllegalArgumentException(errorPrefix + "tickPeriod must be above 15");
         }
         if(initialAnimalCount <= 0) {
             throw new IllegalArgumentException(errorPrefix + "initialAnimalCount must be a positive integer");
