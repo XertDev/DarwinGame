@@ -7,7 +7,6 @@ import agh.cs.engine.utils.Vector2D;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,9 +20,6 @@ public class MapVisualisation extends JPanel {
     private int cellSize;
     private static int MAX_WINDOW_SIZE = 700;
 
-    private int canvasWidth;
-    private int canvasHeight;
-
     private int jungleWidth;
     private int jungleHeight;
 
@@ -32,10 +28,9 @@ public class MapVisualisation extends JPanel {
 
     private final float maxEnergy;
 
-    private Map<Vector2D, Color> entitiesFields = new HashMap<>();
     private Semaphore mapLock;
 
-    public MapVisualisation(WorldMap map, float maxEnergy, Semaphore mapLock) {
+    MapVisualisation(WorldMap map, float maxEnergy, Semaphore mapLock) {
         this.maxEnergy = maxEnergy;
         this.map = map;
         this.mapLock = mapLock;
@@ -50,8 +45,8 @@ public class MapVisualisation extends JPanel {
         jungleYOffset = mapHeight/2 - jungleHeight/2;
 
         cellSize =  MAX_WINDOW_SIZE / Math.max(mapHeight, mapWidth);
-        canvasWidth = cellSize * mapWidth;
-        canvasHeight = cellSize * mapHeight;
+        int canvasWidth = cellSize * mapWidth;
+        int canvasHeight = cellSize * mapHeight;
 
         System.out.println(canvasHeight);
 
@@ -80,7 +75,6 @@ public class MapVisualisation extends JPanel {
     @Override
     public void paint(Graphics graphics) {
         super.paint(graphics);
-        entitiesFields.clear();
         paintBackground(graphics);
         try{
             mapLock.acquire();

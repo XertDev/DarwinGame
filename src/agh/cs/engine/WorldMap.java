@@ -6,7 +6,6 @@ import agh.cs.engine.utils.MapDirection;
 import agh.cs.engine.utils.Vector2D;
 
 import java.util.*;
-import java.util.concurrent.Semaphore;
 import java.util.stream.IntStream;
 
 public class WorldMap implements IPositionChangeObserver {
@@ -150,7 +149,10 @@ public class WorldMap implements IPositionChangeObserver {
         }
     }
 
-    public void grassEated(Vector2D pos) {
+    public void grassEaten(Vector2D pos) {
+        if(!pos.follows(leftBottomWorldCorner) || !pos.precedes(rightTopWorldCorner)) {
+            throw new IllegalArgumentException("Eaten grass position outside of map");
+        }
         grassFields.remove(pos);
         if(isFieldEmpty(pos)) {
             setFieldEmpty(pos);

@@ -12,8 +12,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class SimulatorVisualiser extends JPanel {
-    private MapVisualisation mapVisualisation;
-    private ScheduledExecutorService executor;
     private JLabel animalCountLabel = new JLabel();
     private JLabel grassCountLabel = new JLabel();
     private JLabel averageAgeLabel = new JLabel();
@@ -25,8 +23,8 @@ public class SimulatorVisualiser extends JPanel {
 
     private boolean pauseFlag = false;
 
-    public SimulatorVisualiser(World world, int ticks, float maxEnergy) {
-        mapVisualisation = new MapVisualisation(world.getMap(), maxEnergy, mapLock);
+    private SimulatorVisualiser(World world, int ticks, float maxEnergy) {
+        MapVisualisation mapVisualisation = new MapVisualisation(world.getMap(), maxEnergy, mapLock);
 
         Box hBox = Box.createHorizontalBox();
         Box sidePanel = Box.createVerticalBox();
@@ -50,38 +48,35 @@ public class SimulatorVisualiser extends JPanel {
         grassCountLabel.setPreferredSize(new Dimension(150,50));
         averageAgeLabel.setPreferredSize(new Dimension(300, 50));
 
-        Runnable cycle = new Runnable() {
-            @Override
-            public void run() {
-                int animalsCount;
-                int grassCount;
-                long epoch;
-                float averageAge;
-                if (pauseFlag) {
-                    return;
-                }
-                try {
-                    mapLock.acquire();
-                    world.runEpoch();
-                    epoch = world.getEpoch();
-                    animalsCount = world.getAnimalCount();
-                    grassCount = world.getGrassCount();
-                    averageAge = world.getAverageLivingAnimalsAge();
-
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    mapLock.release();
-                }
-
-                animalCountLabel.setText("Animals: " + animalsCount);
-                grassCountLabel.setText("Grass: " + grassCount);
-                averageAgeLabel.setText("Average animal age: " + averageAge);
-                epochLabel.setText("Epoch: " + epoch);
-                deathCounterLabel.setText("Dead animals: " + world.getDeathCounter());
-                averageDeathAgeLabel.setText("Avg death age: " + world.getAverageDeathAge());
-                repaint();
+        Runnable cycle = () -> {
+            int animalsCount;
+            int grassCount;
+            long epoch;
+            float averageAge;
+            if (pauseFlag) {
+                return;
             }
+            try {
+                mapLock.acquire();
+                world.runEpoch();
+                epoch = world.getEpoch();
+                animalsCount = world.getAnimalCount();
+                grassCount = world.getGrassCount();
+                averageAge = world.getAverageLivingAnimalsAge();
+
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } finally {
+                mapLock.release();
+            }
+
+            animalCountLabel.setText("Animals: " + animalsCount);
+            grassCountLabel.setText("Grass: " + grassCount);
+            averageAgeLabel.setText("Average animal age: " + averageAge);
+            epochLabel.setText("Epoch: " + epoch);
+            deathCounterLabel.setText("Dead animals: " + world.getDeathCounter());
+            averageDeathAgeLabel.setText("Avg death age: " + world.getAverageDeathAge());
+            repaint();
         };
 
         InputMap im = getInputMap(WHEN_FOCUSED);
@@ -96,11 +91,11 @@ public class SimulatorVisualiser extends JPanel {
             }
         });
 
-        executor = Executors.newScheduledThreadPool(1);
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(cycle, 0, ticks, TimeUnit.MILLISECONDS);
     }
 
-    public void togglePause() {
+    private void togglePause() {
         if(pauseFlag){
             resume();
         } else {
@@ -108,15 +103,15 @@ public class SimulatorVisualiser extends JPanel {
         }
     }
 
-    public void pause() {
+    private void pause() {
         pauseFlag = true;
     }
 
-    public void resume() {
+    private void resume() {
         pauseFlag = false;
     }
 
-    private static void createAndShowGUI(World world, int tickCount, float maxEnergy) {
+    private static void show(World world, int tickCount, float maxEnergy) {
         JFrame.setDefaultLookAndFeelDecorated(false);
 
         JFrame frame = new JFrame("DarwinGame");
@@ -134,9 +129,7 @@ public class SimulatorVisualiser extends JPanel {
 
     static public void start(World world, int tickCount, float maxEnergy) {
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() { createAndShowGUI(world, tickCount, maxEnergy);}
-        });
+        SwingUtilities.invokeLater(() -> show(world, tickCount, maxEnergy));
 
     }
 }

@@ -1,6 +1,5 @@
 package agh.cs.engine;
 
-import agh.cs.engine.entities.Genome;
 import agh.cs.engine.utils.Vector2D;
 import agh.cs.engine.entities.Animal;
 
@@ -9,7 +8,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class World {
-    private Random generator = new Random();
     private List<Animal> animals = new ArrayList<>();
     private WorldMap map;
     private long epoch = 0;
@@ -37,13 +35,13 @@ public class World {
         IntStream.range(0, initialGrassFieldCount).forEach((i) -> map.generateSavannaGrass());
     }
 
-    public void placeAnimal(Animal animal) {
+    private void placeAnimal(Animal animal) {
         map.placeAnimal(animal);
         animals.add(animal);
     }
 
     public void placeRandomAnimals(int count) {
-        for(int i = 0; i < count; ++i) {
+         for(int i = 0; i < count; ++i) {
             Vector2D pos = map.findRandomEmptyField().orElseThrow(
                     () -> new RuntimeException("Cannot place new animal. Empty field not found")
             );
@@ -90,7 +88,7 @@ public class World {
                         .collect(Collectors.toList());
                 double foodEnergyPerAnimal = grassEnergy / strongestAnimals.size();
                 strongestAnimals.forEach((animal -> animal.eat(foodEnergyPerAnimal)));
-                map.grassEated(pos);
+                map.grassEaten(pos);
             }
         }
     }
