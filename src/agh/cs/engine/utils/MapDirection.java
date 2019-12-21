@@ -1,4 +1,4 @@
-package agh.cs;
+package agh.cs.engine.utils;
 
 public enum MapDirection {
     NORTH( "N", new Vector2D(0, 1)),

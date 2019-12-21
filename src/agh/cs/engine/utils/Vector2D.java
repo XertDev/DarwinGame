@@ -1,4 +1,4 @@
-package agh.cs;
+package agh.cs.engine.utils;
 
 import java.util.Objects;
 
