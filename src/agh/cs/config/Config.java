@@ -19,6 +19,7 @@ public class Config {
 
     private float maxEnergy;
     private int initialGrassFieldsCount;
+    private int initialAnimalCount;
 
     private int tickCount;
 
@@ -58,6 +59,10 @@ public class Config {
         return initialGrassFieldsCount;
     }
 
+    public int getInitialAnimalCount() {
+        return initialAnimalCount;
+    }
+
     public void validateValues() {
         final String errorPrefix = "InvalidConfigOption:";
 
@@ -86,7 +91,10 @@ public class Config {
             throw new IllegalArgumentException(errorPrefix + "initialGrassFieldsCount must be a positive integer");
         }
         if(tickCount <= 15) {
-            throw new IllegalArgumentException(errorPrefix + "tickCount should be above 15");
+            throw new IllegalArgumentException(errorPrefix + "tickCount must be above 15");
+        }
+        if(initialAnimalCount <= 0) {
+            throw new IllegalArgumentException(errorPrefix + "initialAnimalCount must be a positive integer");
         }
     }
 

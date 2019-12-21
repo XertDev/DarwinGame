@@ -65,20 +65,23 @@ public class MapVisualisation extends JPanel {
         return new Vector2D(posX, posY);
     }
 
-    @Override
-    public void paint(Graphics graphics) {
-        super.paint(graphics);
-        entitiesFields.clear();
+    private void paintBackground(Graphics graphics) {
         graphics.setColor(Color.yellow);
         graphics.fillRect(0,0, getWidth(), getHeight());
 
         graphics.setColor(Color.green);
         graphics.fillRect(
-                 jungleXOffset * cellSize,
+                jungleXOffset * cellSize,
                 jungleYOffset * cellSize,
                 jungleWidth * cellSize,
                 jungleHeight * cellSize);
+    }
 
+    @Override
+    public void paint(Graphics graphics) {
+        super.paint(graphics);
+        entitiesFields.clear();
+        paintBackground(graphics);
         try{
             mapLock.acquire();
             List<List<Animal>> groupedAnimals = map.getGroupedAnimals();

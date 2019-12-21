@@ -12,20 +12,20 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class SimulatorVisualiser extends JPanel {
-    private World world;
-    public MapVisualisation mapVisualisation;
+    private MapVisualisation mapVisualisation;
     private ScheduledExecutorService executor;
     private JLabel animalCountLabel = new JLabel();
     private JLabel grassCountLabel = new JLabel();
     private JLabel averageAgeLabel = new JLabel();
-    private JLabel infoLabel = new JLabel("Press P to pause");
+    private JLabel epochLabel = new JLabel();
+    private JLabel averageDeathAgeLabel = new JLabel();
+    private JLabel deathCounterLabel = new JLabel();
 
     private Semaphore mapLock = new Semaphore(1);
 
     private boolean pauseFlag = false;
 
     public SimulatorVisualiser(World world, int ticks, float maxEnergy) {
-        this.world = world;
         mapVisualisation = new MapVisualisation(world.getMap(), maxEnergy, mapLock);
 
         Box hBox = Box.createHorizontalBox();
@@ -35,6 +35,11 @@ public class SimulatorVisualiser extends JPanel {
         sidePanel.add(animalCountLabel);
         sidePanel.add(grassCountLabel);
         sidePanel.add(averageAgeLabel);
+        sidePanel.add(epochLabel);
+        sidePanel.add(deathCounterLabel);
+        sidePanel.add(averageDeathAgeLabel);
+
+        JLabel infoLabel = new JLabel("Press P to pause");
         sidePanel.add(infoLabel);
 
 
@@ -45,12 +50,12 @@ public class SimulatorVisualiser extends JPanel {
         grassCountLabel.setPreferredSize(new Dimension(150,50));
         averageAgeLabel.setPreferredSize(new Dimension(300, 50));
 
-
         Runnable cycle = new Runnable() {
             @Override
             public void run() {
                 int animalsCount;
                 int grassCount;
+                long epoch;
                 float averageAge;
                 if (pauseFlag) {
                     return;
@@ -58,6 +63,7 @@ public class SimulatorVisualiser extends JPanel {
                 try {
                     mapLock.acquire();
                     world.runEpoch();
+                    epoch = world.getEpoch();
                     animalsCount = world.getAnimalCount();
                     grassCount = world.getGrassCount();
                     averageAge = world.getAverageLivingAnimalsAge();
@@ -68,10 +74,12 @@ public class SimulatorVisualiser extends JPanel {
                     mapLock.release();
                 }
 
-
                 animalCountLabel.setText("Animals: " + animalsCount);
                 grassCountLabel.setText("Grass: " + grassCount);
                 averageAgeLabel.setText("Average animal age: " + averageAge);
+                epochLabel.setText("Epoch: " + epoch);
+                deathCounterLabel.setText("Dead animals: " + world.getDeathCounter());
+                averageDeathAgeLabel.setText("Avg death age: " + world.getAverageDeathAge());
                 repaint();
             }
         };

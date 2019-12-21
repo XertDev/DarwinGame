@@ -20,7 +20,8 @@ public class Main {
                 config.getInitialGrassFieldsCount(),
                 map
         );
-        world.placeRandomAnimals(30);
+
+        world.placeRandomAnimals(config.getInitialAnimalCount());
 
         SimulatorVisualiser.start(world, config.getTickCount(), config.getMaxEnergy());
     }

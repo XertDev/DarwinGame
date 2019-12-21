@@ -37,6 +37,10 @@ public class Animal {
         return age;
     }
 
+    public Genome getGenome() {
+        return genome;
+    }
+
     public Animal(WorldMap map, Vector2D position, float initialEnergy, float maxEnergy) {
         this.position = position;
         this.energy = initialEnergy;
@@ -99,9 +103,5 @@ public class Animal {
         position = worldMap.nextFieldInDir(position, facingDirection);
 
         positionChange(oldPos, position);
-    }
-
-    public String getGenes() {
-        return "A";
     }
 }

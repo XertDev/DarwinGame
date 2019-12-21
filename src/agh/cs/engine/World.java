@@ -1,5 +1,6 @@
 package agh.cs.engine;
 
+import agh.cs.engine.entities.Genome;
 import agh.cs.engine.utils.Vector2D;
 import agh.cs.engine.entities.Animal;
 
@@ -11,10 +12,13 @@ public class World {
     private Random generator = new Random();
     private List<Animal> animals = new ArrayList<>();
     private WorldMap map;
+    private long epoch = 0;
     private float grassEnergy;
     private float dailyEnergyDepletion;
     private float initialAnimalEnergy;
     private float maxEnergy;
+    private int deathCounter = 0;
+    private long deathAgeSum = 0;
 
     public World(
             float grassEnergy,
@@ -52,6 +56,23 @@ public class World {
         return map;
     }
 
+    public long getEpoch()
+    {
+        return epoch;
+    }
+
+    public float getAverageDeathAge() {
+        if(deathCounter == 0) {
+            return 0;
+        } else {
+            return deathAgeSum/deathCounter;
+        }
+    }
+
+    public int getDeathCounter() {
+        return deathCounter;
+    }
+
     private void updateAnimalsPosition() {
         animals.forEach(Animal::run);
     }
@@ -78,6 +99,8 @@ public class World {
         animals.forEach((animal -> animal.depleteEnergy(dailyEnergyDepletion)));
         List<Animal> tempAnimals = new ArrayList<>(animals);
         tempAnimals.stream().filter(Animal::isDead).forEach(animal -> {
+            ++deathCounter;
+            deathAgeSum += animal.getAge();
             map.removeAnimal(animal);
             animals.remove(animal);
         });
@@ -126,5 +149,6 @@ public class World {
         feedAnimals();
         breedAnimals();
         growGrass();
+        ++epoch;
     }
 }

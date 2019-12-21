@@ -3,11 +3,12 @@
   "height": 80,
   "jungleRatio": 0.4,
 
-  "startEnergy": 50.0,
-  "plantEnergy": 30.0,
-  "moveEnergy": 1.0,
+  "startEnergy": 100.0,
+  "plantEnergy": 40.0,
+  "moveEnergy": 2.0,
 
-  "initialGrassFieldsCount": 40,
+  "initialAnimalCount": 10,
+  "initialGrassFieldsCount": 200,
   "maxEnergy": 300.0,
   "tickCount": 20
 }
