@@ -17,6 +17,10 @@ public class Config {
     private float plantEnergy;
     private float moveEnergy;
 
+    private float maxEnergy;
+    private int initialGrassFieldsCount;
+
+    private int tickCount;
 
     public int getWidth() {
         return width;
@@ -42,6 +46,18 @@ public class Config {
         return moveEnergy;
     }
 
+    public float getMaxEnergy() {
+        return maxEnergy;
+    }
+
+    public int getTickCount() {
+        return tickCount;
+    }
+
+    public int getInitialGrassFieldsCount() {
+        return initialGrassFieldsCount;
+    }
+
     public void validateValues() {
         final String errorPrefix = "InvalidConfigOption:";
 
@@ -52,20 +68,29 @@ public class Config {
             throw new IllegalArgumentException(errorPrefix + "Height must be a positive integer");
         }
         if(0.0 >= jungleRatio && jungleRatio >= 1.0) {
-            throw new IllegalArgumentException(errorPrefix + "Jungle ration must be in range: 0.0 - 1.0");
+            throw new IllegalArgumentException(errorPrefix + "jungleRation must be in range: 0.0 - 1.0");
         }
         if(startEnergy <= 0) {
-            throw new IllegalArgumentException(errorPrefix + "Start energy must be a positive float");
+            throw new IllegalArgumentException(errorPrefix + "startEnergy must be a positive float");
         }
         if(plantEnergy <= 0) {
-            throw new IllegalArgumentException(errorPrefix + "Plant energy must be a positive float");
+            throw new IllegalArgumentException(errorPrefix + "plantEnergy must be a positive float");
         }
         if(moveEnergy <= 0) {
-            throw new IllegalArgumentException(errorPrefix + "Move energy must be a positive float");
+            throw new IllegalArgumentException(errorPrefix + "moveEnergy must be a positive float");
+        }
+        if(maxEnergy < startEnergy) {
+            throw new IllegalArgumentException(errorPrefix + "maxEnergy must be bigger than start energy");
+        }
+        if(initialGrassFieldsCount < 0) {
+            throw new IllegalArgumentException(errorPrefix + "initialGrassFieldsCount must be a positive integer");
+        }
+        if(tickCount <= 15) {
+            throw new IllegalArgumentException(errorPrefix + "tickCount should be above 15");
         }
     }
 
-    static public Config loadConfigFromFile(String filename) {
+    static public Config fromFile(String filename) {
         Gson gson = new Gson();
         Config config;
         try {

@@ -1,9 +1,13 @@
 {
-  "width": 5,
-  "height": 5,
-  "jungleRatio": 0.5,
+  "width": 80,
+  "height": 80,
+  "jungleRatio": 0.4,
 
   "startEnergy": 50.0,
-  "plantEnergy": 10.0,
-  "moveEnergy": 1.0
+  "plantEnergy": 30.0,
+  "moveEnergy": 1.0,
+
+  "initialGrassFieldsCount": 40,
+  "maxEnergy": 300.0,
+  "tickCount": 20
 }

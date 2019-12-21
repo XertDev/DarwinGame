@@ -5,26 +5,51 @@ import agh.cs.engine.entities.Animal;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class World {
     private Random generator = new Random();
     private List<Animal> animals = new ArrayList<>();
     private WorldMap map;
-    private double grassEnergy;
-    private double dailyEnergyDepletion;
-    private double initialAnimalEnergy;
+    private float grassEnergy;
+    private float dailyEnergyDepletion;
+    private float initialAnimalEnergy;
+    private float maxEnergy;
 
-    public World(float grassEnergy, float dailyEnergyDepletion, float initialAnimalEnergy, WorldMap map) {
+    public World(
+            float grassEnergy,
+            float dailyEnergyDepletion,
+            float initialAnimalEnergy,
+            float maxEnergy,
+            int initialGrassFieldCount,
+            WorldMap map
+    ) {
         this.map = map;
         this.grassEnergy = grassEnergy;
+        this.maxEnergy = maxEnergy;
         this.dailyEnergyDepletion = dailyEnergyDepletion;
         this.initialAnimalEnergy = initialAnimalEnergy;
-
+        IntStream.range(0, initialGrassFieldCount).forEach((i) -> map.generateJungleGrass());
+        IntStream.range(0, initialGrassFieldCount).forEach((i) -> map.generateSteppeGrass());
     }
 
     public void placeAnimal(Animal animal) {
         map.placeAnimal(animal);
         animals.add(animal);
+    }
+
+    public void placeRandomAnimals(int count) {
+        for(int i = 0; i < count; ++i) {
+            Vector2D pos = map.findRandomEmptyField().orElseThrow(
+                    () -> new RuntimeException("Cannot place new animal. Empty field not found")
+            );
+            Animal animal = new Animal(map, pos, initialAnimalEnergy, maxEnergy);
+            placeAnimal(animal);
+        }
+    }
+
+    public WorldMap getMap() {
+        return map;
     }
 
     private void updateAnimalsPosition() {
@@ -71,16 +96,19 @@ public class World {
 
             if(strongestAnimals.length < 2) continue;
 
-            Animal[] breedingPair = generator.ints( 0,strongestAnimals.length)
-                    .distinct()
-                    .limit(2)
-                    .boxed()
-                    .map(integer -> strongestAnimals[integer])
-                    .toArray(Animal[]::new);
+            Arrays.sort(strongestAnimals, Animal.energyEntityComparator);
 
-            Animal child = breedingPair[0].breed(breedingPair[1], childPos);
+            Animal child = strongestAnimals[0].breed(strongestAnimals[1], childPos, maxEnergy);
             placeAnimal(child);
         }
+    }
+
+    public int getAnimalCount() {
+        return animals.size();
+    }
+
+    public int getGrassCount() {
+        return map.getGrassFields().size();
     }
 
     private void growGrass() {

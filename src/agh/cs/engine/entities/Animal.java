@@ -11,7 +11,8 @@ import java.util.stream.IntStream;
 public class Animal {
     public static final Comparator<Animal> energyEntityComparator = Comparator.comparingDouble(Animal::getEnergy).reversed();
 
-    private int energy;
+    private float energy;
+    private final float maxEnergy;
     private Vector2D position;
     private MapDirection facingDirection = MapDirection.NORTH;
     private Genome genome;
@@ -28,19 +29,23 @@ public class Animal {
         return position;
     }
 
-    public double getEnergy() {
+    public float getEnergy() {
         return energy;
     }
 
-    public Animal(WorldMap map, Vector2D position, int initialEnergy) {
+    public Animal(WorldMap map, Vector2D position, float initialEnergy, float maxEnergy) {
         this.position = position;
         this.energy = initialEnergy;
+        this.maxEnergy = maxEnergy;
         this.worldMap = map;
         this.genome = new Genome();
     }
 
-    private Animal(WorldMap map, Vector2D position, int initialEnergy, Genome genome) {
-        this(map, position, initialEnergy);
+    private Animal(WorldMap map, Vector2D position, float initialEnergy, float maxEnergy, Genome genome) {
+        this.position = position;
+        this.energy = initialEnergy;
+        this.maxEnergy = maxEnergy;
+        this.worldMap = map;
         this.genome = genome;
     }
 
@@ -58,16 +63,19 @@ public class Animal {
 
     public void eat(double foodEnergy) {
         energy += foodEnergy;
+        if(energy > maxEnergy) {
+            energy = maxEnergy;
+        }
     }
 
-    public Animal breed(Animal mate, Vector2D childPos) {
-        int childEnergy = energy/4 + mate.energy/4;
+    public Animal breed(Animal mate, Vector2D childPos, float childMaxEnergy) {
+        float childEnergy = energy/4 + mate.energy/4;
         energy -= energy/4;
         mate.energy -= mate.energy/4;
 
         Genome childGenome = genome.mixGenes(mate.genome);
 
-        return new Animal(worldMap, childPos, childEnergy, childGenome);
+        return new Animal(worldMap, childPos, childEnergy, childMaxEnergy, childGenome);
     }
 
     public void depleteEnergy(double usedEnergy) {

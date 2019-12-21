@@ -5,6 +5,7 @@ import agh.cs.engine.entities.Grass;
 import agh.cs.engine.utils.MapDirection;
 import agh.cs.engine.utils.Vector2D;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -164,6 +165,23 @@ public class WorldMap implements IPositionChangeObserver {
         return grassFields.entrySet();
     }
 
+    public Optional<Vector2D> findRandomEmptyField() {
+        if(emptyJungleFields.isEmpty() && emptySteppeFields.isEmpty()) {
+                return Optional.empty();
+        }
+        if(!emptyJungleFields.isEmpty() && !emptySteppeFields.isEmpty()) {
+            if(generator.nextBoolean()) {
+                return Optional.of(emptyJungleFields.get(generator.nextInt(emptyJungleFields.size())));
+            }
+            return Optional.of(emptySteppeFields.get(generator.nextInt(emptySteppeFields.size())));
+        }
+        if(emptyJungleFields.isEmpty()) {
+            return Optional.of(emptySteppeFields.get(generator.nextInt(emptySteppeFields.size())));
+        } else {
+            return Optional.of(emptyJungleFields.get(generator.nextInt(emptyJungleFields.size())));
+
+        }
+    }
 
     public boolean isGrassField(Vector2D pos) {
         return grassFields.containsKey(pos);
