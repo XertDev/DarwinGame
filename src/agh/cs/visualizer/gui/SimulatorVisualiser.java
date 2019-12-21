@@ -4,8 +4,11 @@ import agh.cs.engine.World;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class SimulatorVisualiser extends JPanel {
@@ -14,10 +17,16 @@ public class SimulatorVisualiser extends JPanel {
     private ScheduledExecutorService executor;
     private JLabel animalCountLabel = new JLabel();
     private JLabel grassCountLabel = new JLabel();
+    private JLabel averageAgeLabel = new JLabel();
+    private JLabel infoLabel = new JLabel("Press P to pause");
+
+    private Semaphore mapLock = new Semaphore(1);
+
+    private boolean pauseFlag = false;
 
     public SimulatorVisualiser(World world, int ticks, float maxEnergy) {
         this.world = world;
-        mapVisualisation = new MapVisualisation(world.getMap(), maxEnergy);
+        mapVisualisation = new MapVisualisation(world.getMap(), maxEnergy, mapLock);
 
         Box hBox = Box.createHorizontalBox();
         Box sidePanel = Box.createVerticalBox();
@@ -25,32 +34,78 @@ public class SimulatorVisualiser extends JPanel {
         hBox.add(sidePanel);
         sidePanel.add(animalCountLabel);
         sidePanel.add(grassCountLabel);
+        sidePanel.add(averageAgeLabel);
+        sidePanel.add(infoLabel);
 
 
         hBox.add(mapVisualisation);
         add(hBox);
 
-        animalCountLabel.setPreferredSize(new Dimension(100,50));
-        grassCountLabel.setPreferredSize(new Dimension(100,50));
+        animalCountLabel.setPreferredSize(new Dimension(150,50));
+        grassCountLabel.setPreferredSize(new Dimension(150,50));
+        averageAgeLabel.setPreferredSize(new Dimension(300, 50));
 
 
         Runnable cycle = new Runnable() {
             @Override
             public void run() {
-                System.out.println("test");
+                int animalsCount;
+                int grassCount;
+                float averageAge;
+                if (pauseFlag) {
+                    return;
+                }
+                try {
+                    mapLock.acquire();
+                    world.runEpoch();
+                    animalsCount = world.getAnimalCount();
+                    grassCount = world.getGrassCount();
+                    averageAge = world.getAverageLivingAnimalsAge();
 
-                world.runEpoch();
-                int animalsCount = world.getAnimalCount();
-                int grassCount = world.getGrassCount();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    mapLock.release();
+                }
+
 
                 animalCountLabel.setText("Animals: " + animalsCount);
                 grassCountLabel.setText("Grass: " + grassCount);
-                System.out.println(world.getAnimalCount());
+                averageAgeLabel.setText("Average animal age: " + averageAge);
                 repaint();
             }
         };
+
+        InputMap im = getInputMap(WHEN_FOCUSED);
+        ActionMap am = getActionMap();
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0), "onPause");
+
+        am.put("onPause", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                togglePause();
+            }
+        });
+
         executor = Executors.newScheduledThreadPool(1);
         executor.scheduleAtFixedRate(cycle, 0, ticks, TimeUnit.MILLISECONDS);
+    }
+
+    public void togglePause() {
+        if(pauseFlag){
+            resume();
+        } else {
+            pause();
+        }
+    }
+
+    public void pause() {
+        pauseFlag = true;
+    }
+
+    public void resume() {
+        pauseFlag = false;
     }
 
     private static void createAndShowGUI(World world, int tickCount, float maxEnergy) {

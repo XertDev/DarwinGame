@@ -30,7 +30,7 @@ public class World {
         this.dailyEnergyDepletion = dailyEnergyDepletion;
         this.initialAnimalEnergy = initialAnimalEnergy;
         IntStream.range(0, initialGrassFieldCount).forEach((i) -> map.generateJungleGrass());
-        IntStream.range(0, initialGrassFieldCount).forEach((i) -> map.generateSteppeGrass());
+        IntStream.range(0, initialGrassFieldCount).forEach((i) -> map.generateSavannaGrass());
     }
 
     public void placeAnimal(Animal animal) {
@@ -77,7 +77,7 @@ public class World {
     private void updateAnimalEnergy() {
         animals.forEach((animal -> animal.depleteEnergy(dailyEnergyDepletion)));
         List<Animal> tempAnimals = new ArrayList<>(animals);
-        tempAnimals.stream().filter(animal -> (animal.getEnergy() <=0)).forEach(animal -> {
+        tempAnimals.stream().filter(Animal::isDead).forEach(animal -> {
             map.removeAnimal(animal);
             animals.remove(animal);
         });
@@ -113,7 +113,11 @@ public class World {
 
     private void growGrass() {
         map.generateJungleGrass();
-        map.generateSteppeGrass();
+        map.generateSavannaGrass();
+    }
+
+    public float getAverageLivingAnimalsAge() {
+        return (float)animals.stream().mapToInt(Animal::getAge).average().orElse(0);
     }
 
     public void runEpoch() {

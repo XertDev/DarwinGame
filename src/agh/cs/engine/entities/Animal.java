@@ -6,7 +6,6 @@ import agh.cs.engine.IPositionChangeObserver;
 import agh.cs.engine.WorldMap;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class Animal {
     public static final Comparator<Animal> energyEntityComparator = Comparator.comparingDouble(Animal::getEnergy).reversed();
@@ -16,6 +15,7 @@ public class Animal {
     private Vector2D position;
     private MapDirection facingDirection = MapDirection.NORTH;
     private Genome genome;
+    private int age = 0;
 
     private static Random generator = new Random();
     private Set<IPositionChangeObserver> positionChangedObservers = new HashSet<>();
@@ -31,6 +31,10 @@ public class Animal {
 
     public float getEnergy() {
         return energy;
+    }
+
+    public int getAge() {
+        return age;
     }
 
     public Animal(WorldMap map, Vector2D position, float initialEnergy, float maxEnergy) {
@@ -61,6 +65,10 @@ public class Animal {
         positionChangedObservers.remove(observer);
     }
 
+    public boolean isDead() {
+        return energy < 0;
+    }
+
     public void eat(double foodEnergy) {
         energy += foodEnergy;
         if(energy > maxEnergy) {
@@ -83,6 +91,7 @@ public class Animal {
     }
 
     public void run() {
+        ++age;
         int rotation = genome.getRandomGene();
         facingDirection = facingDirection.rotate(rotation);
 

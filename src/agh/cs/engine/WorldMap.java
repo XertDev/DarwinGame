@@ -5,8 +5,8 @@ import agh.cs.engine.entities.Grass;
 import agh.cs.engine.utils.MapDirection;
 import agh.cs.engine.utils.Vector2D;
 
-import javax.swing.text.html.Option;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 import java.util.stream.IntStream;
 
 public class WorldMap implements IPositionChangeObserver {
@@ -17,7 +17,7 @@ public class WorldMap implements IPositionChangeObserver {
     private final Vector2D rightTopJungleCorner;
 
     private List<Vector2D> emptyJungleFields = new ArrayList<>();
-    private List<Vector2D> emptySteppeFields = new ArrayList<>();
+    private List<Vector2D> emptySavannaFields = new ArrayList<>();
 
     private Random generator = new Random();
 
@@ -42,7 +42,7 @@ public class WorldMap implements IPositionChangeObserver {
         for(int i = 0; i < mapHeight; ++i) {
             for(int j = 0; j < mapWidth; ++j) {
                 if(i >= jungleHeight || j >= jungleWidth) {
-                    emptySteppeFields.add(new Vector2D(j, i));
+                    emptySavannaFields.add(new Vector2D(j, i));
                 }
             }
         }
@@ -63,8 +63,8 @@ public class WorldMap implements IPositionChangeObserver {
         }
     }
 
-    void generateSteppeGrass() {
-        placeGrassInArea(emptySteppeFields);
+    void generateSavannaGrass() {
+        placeGrassInArea(emptySavannaFields);
     }
 
     void generateJungleGrass() {
@@ -118,7 +118,7 @@ public class WorldMap implements IPositionChangeObserver {
         if(isJunglePosition(pos)) {
             emptyJungleFields.add(pos);
         } else {
-            emptySteppeFields.add(pos);
+            emptySavannaFields.add(pos);
         }
     }
 
@@ -126,7 +126,7 @@ public class WorldMap implements IPositionChangeObserver {
         if(isJunglePosition(pos)) {
             emptyJungleFields.remove(pos);
         } else {
-            emptySteppeFields.remove(pos);
+            emptySavannaFields.remove(pos);
         }
     }
 
@@ -166,17 +166,17 @@ public class WorldMap implements IPositionChangeObserver {
     }
 
     public Optional<Vector2D> findRandomEmptyField() {
-        if(emptyJungleFields.isEmpty() && emptySteppeFields.isEmpty()) {
+        if(emptyJungleFields.isEmpty() && emptySavannaFields.isEmpty()) {
                 return Optional.empty();
         }
-        if(!emptyJungleFields.isEmpty() && !emptySteppeFields.isEmpty()) {
+        if(!emptyJungleFields.isEmpty() && !emptySavannaFields.isEmpty()) {
             if(generator.nextBoolean()) {
                 return Optional.of(emptyJungleFields.get(generator.nextInt(emptyJungleFields.size())));
             }
-            return Optional.of(emptySteppeFields.get(generator.nextInt(emptySteppeFields.size())));
+            return Optional.of(emptySavannaFields.get(generator.nextInt(emptySavannaFields.size())));
         }
         if(emptyJungleFields.isEmpty()) {
-            return Optional.of(emptySteppeFields.get(generator.nextInt(emptySteppeFields.size())));
+            return Optional.of(emptySavannaFields.get(generator.nextInt(emptySavannaFields.size())));
         } else {
             return Optional.of(emptyJungleFields.get(generator.nextInt(emptyJungleFields.size())));
 

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 
 public class MapVisualisation extends JPanel {
     private WorldMap map;
@@ -32,10 +33,12 @@ public class MapVisualisation extends JPanel {
     private final float maxEnergy;
 
     private Map<Vector2D, Color> entitiesFields = new HashMap<>();
+    private Semaphore mapLock;
 
-    public MapVisualisation(WorldMap map, float maxEnergy) {
+    public MapVisualisation(WorldMap map, float maxEnergy, Semaphore mapLock) {
         this.maxEnergy = maxEnergy;
         this.map = map;
+        this.mapLock = mapLock;
         final Vector2D mapSize = this.map.getMapSize();
         final Vector2D jungleSize = this.map.getJungleSize();
         mapWidth = mapSize.x;
@@ -76,25 +79,33 @@ public class MapVisualisation extends JPanel {
                 jungleWidth * cellSize,
                 jungleHeight * cellSize);
 
-        List<List<Animal>> groupedAnimals = map.getGroupedAnimals();
-        Set<Map.Entry<Vector2D, Grass>> grassFields = map.getGrassFields();
+        try{
+            mapLock.acquire();
+            List<List<Animal>> groupedAnimals = map.getGroupedAnimals();
+            Set<Map.Entry<Vector2D, Grass>> grassFields = map.getGrassFields();
 
-        graphics.setColor(new Color(100, 255, 100));
-        for(Map.Entry<Vector2D, Grass> grassField: grassFields) {
-            Vector2D pos = toScreenPosition(grassField.getKey());
-            graphics.fillRect(pos.x, pos.y, cellSize, cellSize);
+            graphics.setColor(new Color(100, 255, 100));
+            for(Map.Entry<Vector2D, Grass> grassField: grassFields) {
+                Vector2D pos = toScreenPosition(grassField.getKey());
+                graphics.fillRect(pos.x, pos.y, cellSize, cellSize);
+            }
+
+            for(List<Animal> animalGroup: groupedAnimals) {
+                animalGroup.sort(Animal.energyEntityComparator);
+                float highestEnergy = animalGroup.get(0).getEnergy();
+
+                int redValue = Math.round(255 * highestEnergy / maxEnergy);
+
+                graphics.setColor(new Color(redValue, 0, 0 ));
+
+                Vector2D pos = toScreenPosition(animalGroup.get(0).getPosition());
+                graphics.fillRect(pos.x, pos.y, cellSize, cellSize);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            mapLock.release();
         }
 
-        for(List<Animal> animalGroup: groupedAnimals) {
-            animalGroup.sort(Animal.energyEntityComparator);
-            float highestEnergy = animalGroup.get(0).getEnergy();
-
-            int redValue = Math.round(255 * highestEnergy / maxEnergy);
-
-            graphics.setColor(new Color(redValue, 0, 0 ));
-
-            Vector2D pos = toScreenPosition(animalGroup.get(0).getPosition());
-            graphics.fillRect(pos.x, pos.y, cellSize, cellSize);
-        }
     }
 }
